@@ -1,3 +1,4 @@
+import os
 import random
 import nltk.data
 
@@ -48,8 +49,9 @@ class Markov(object):
         gen_words.append(w2)
         return ' '.join(gen_words)
 
-m = Markov(open('corpus.txt'))
+corpus = os.path.join(os.path.dirname(__file__), 'corpus.txt')
+m = Markov(open(corpus))
 
 text = m.generate_markov_text(300)
 sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-print ' '.join(sent_detector.tokenize(text.strip())[1:5])
+print ' '.join(sent_detector.tokenize(text.strip())[1:4])
