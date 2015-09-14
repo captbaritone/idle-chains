@@ -1,20 +1,21 @@
-import os
-import random
-import nltk.data
-
+from __future__ import print_function
+from builtins import range
+import os, random, nltk.data
 
 class Markov(object):
-
-    def __init__(self, open_file):
+    def __init__(self, corpus_file = None):
+        if corpus_file is None:
+            corpus_file = os.path.join(os.path.dirname(__file__), 'corpus.txt')
         self.cache = {}
-        self.open_file = open_file
+        self.corpus_file = corpus_file
         self.words = self.file_to_words()
         self.word_size = len(self.words)
         self.database()
 
     def file_to_words(self):
-        self.open_file.seek(0)
-        data = self.open_file.read()
+        data = None
+        with open(self.corpus_file) as corpus:
+            data = corpus.read()
         words = data.split()
         return words
 
@@ -43,15 +44,14 @@ class Markov(object):
         seed_word, next_word = self.words[seed], self.words[seed + 1]
         w1, w2 = seed_word, next_word
         gen_words = []
-        for i in xrange(size):
+        for i in range(size):
             gen_words.append(w1)
             w1, w2 = w2, random.choice(self.cache[(w1, w2)])
         gen_words.append(w2)
         return ' '.join(gen_words)
 
-corpus = os.path.join(os.path.dirname(__file__), 'corpus.txt')
-m = Markov(open(corpus))
-
-text = m.generate_markov_text(300)
-sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-print ' '.join(sent_detector.tokenize(text.strip())[1:4])
+if __name__ == '__main__':
+    m = Markov()
+    text = m.generate_markov_text(300)
+    sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+    print(' '.join(sent_detector.tokenize(text.strip())[1:4]))
